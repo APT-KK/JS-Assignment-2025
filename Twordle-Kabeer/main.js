@@ -6,15 +6,15 @@ let currentAttempt = 0;
 
 // fetching the 2 words using an API key
 const fetchWords = async () => {
-    try {
-        const response = await fetch ('https://random-word-api.herokuapp.com/word?number=2&length=5');
-        const words = await response.json();
-        targetWords = words.map(word => word.toUpperCase());
-    } catch (error) {
-        console.error('Error fetching words:', error);
-        targetWords = [];
-    }
-}
+  try {
+    const response = await fetch ('https://random-word-api.herokuapp.com/word?number=2&length=5');
+    const words = await response.json();
+    targetWords = words.map(word => word.toUpperCase());
+  } catch (error) {
+    console.error('Error fetching words:', error);
+    return [];
+  }
+};
 
 
 
@@ -199,16 +199,16 @@ const audio = document.getElementById('bg-music');
 const btn = document.getElementById('toggle-music');
 audio.volume = 0.5; // reducing the initial volume
 audio.muted = true;
-btn.innerHTML = '<img src="mute.svg" alt="Unmute Music" class="icon" style="width: 20px; height: 20px;">';
+btn.innerHTML = '<img src="assets/mute.svg" alt="Unmute Music" class="icon" style="width: 20px; height: 20px;">';
 
 btn.onclick = function() {
   if (audio.muted) {
     audio.muted = false;
     audio.play();
-    btn.innerHTML = '<img src="unmute.svg" alt="Mute Music" class="icon" style="width: 20px; height: 20px;">';
+    btn.innerHTML = '<img src="assets/unmute.svg" alt="Mute Music" class="icon" style="width: 20px; height: 20px;">';
   } else {
     audio.muted = true;
-    btn.innerHTML = '<img src="mute.svg" alt="Unmute Music" class="icon" style="width: 20px; height: 20px;">';
+    btn.innerHTML = '<img src="assets/mute.svg" alt="Unmute Music" class="icon" style="width: 20px; height: 20px;">';
   }
 };
 
