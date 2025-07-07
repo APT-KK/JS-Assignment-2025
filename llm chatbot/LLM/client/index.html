@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Chat App</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Sidebar Section -->
+        <div class="sidebar">
+            <h1 class="app-title">LLM ChatBot</h1>
+            <button class="new-chat-btn" onclick="startNewChat()">+ New Chat</button>
+            
+            <div class="api-key-section">
+                <label for="apiKey">OpenRouter API Key:</label>
+                <input type="password" id="apiKey" class="api-key-input" placeholder="Enter your API key...">
+            </div>
+            
+            <div class="model-selector">
+                <label for="modelSelect">Select Model:</label>
+               <select id="modelSelect" class="model-select">
+                <option value="microsoft/phi-3-mini-128k-instruct:free">Phi-3 Mini</option>
+                <option value="mistralai/mistral-7b-instruct:free">Mistral 7B</option>
+                <option value = "moonshotai/kimi-dev-72b:free">Kimi</option>
+                <option value = "deepseek/deepseek-r1-0528-qwen3-8b:free">Qwen</option>
+                <option value = "deepseek/deepseek-r1-0528:free">Deepseek</option>
+                <option value = "sarvamai/sarvam-m:free">Sarvam</option>
+                <option value = "google/gemma-3n-e4b-it:free">Gemma</option>
+                <option value = "tngtech/deepseek-r1t-chimera:free">Chimera</option>
+                <option value = "microsoft/mai-ds-r1:free">Mai</option>
+                </select>
+            </div>
+            
+            <div class="model-info">
+                <small style="color: #888; font-size: 12px;">
+                    Note: Free models are subject to rate limits and availability may change.
+                </small>
+            </div>
+        </div>
+
+        <!-- Main Chat Area -->
+        <div class="chat-container">
+            <div class="chat-header">
+                <h2 style="display:inline-block;">Chat Box</h2>
+                <button id="deleteChatBtn" class="delete-chat-btn" title="Delete Chat" style="float:right; margin-left:16px;">
+                    🗑️
+                </button>
+                <div class="current-model" id="currentModel">Phi-3 Mini</div>
+            </div>
+            
+            <div class="messages-container" id="messagesContainer">
+                <div class="welcome-screen">
+                    <h1>Welcome to AI Chat</h1>
+                    <p>Enter your OpenRouter API key and start chatting with AI models!</p>
+                  <div style="margin-top: 20px; margin-left: 20px; padding: 16px; background: rgba(255,255,255,0.1); border-radius: 8px; max-width: 400px;">
+                <h3 style="color: #fff; margin-bottom: 8px;">Quick Start:</h3>
+                <ol style="color: #ccc; font-size: 14px; text-align: left;">
+                    <li>Get your free API key from <a href="https://openrouter.ai/keys" target="_blank" style="color: #4a9eff;">OpenRouter</a></li>
+                    <li>Enter the API key in the sidebar</li>
+                    <li>Select a model</li>
+                    <li>Start chatting!</li>
+                </ol>
+              </div>
+             </div>
+         </div>
+            
+            <div class="input-container">
+                <div class="input-wrapper">
+                    <textarea 
+                        id="messageInput" 
+                        class="message-input" 
+                        placeholder="Type your message..."
+                        rows="1"
+                    ></textarea>
+                    <button id="sendBtn" class="send-btn">
+                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none">
+                            <path d="M22 2L11 13" stroke="currentColor" stroke-width="2" stroke-linecap="round"/>
+                            <path d="M22 2L15 22L11 13L2 9L22 2Z" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
+                        </svg>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script type="module" src="script.js"></script>
+</body>
+</html>
