@@ -72,7 +72,6 @@ const PRODUCTION_WORDS = [
   "WRITE", "WRONG", "WROTE", "YOUNG", "YOUTH"
 ];
 
-// Replace your fetchWords function with this:
 const fetchWords = async () => {
   try {
     // Shuffle the array and pick 2 random words
@@ -86,7 +85,6 @@ const fetchWords = async () => {
     targetWords = ['ABOUT', 'WORLD'];
   }
 };
-
 
 
 
@@ -257,9 +255,9 @@ const updateBoards = ()=> {
         for(let k = 0 ; k < WORD_LENGTH ; k++) {
             const tile = document.getElementById(`tile-${board+1}-${k+1}-${currentAttempt+1}`);
             tile.textContent = currentGuess[k] || '';
-            tile.className = 'tile'; // for checking the color
+            tile.classList.remove('pop');
+            tile.classList.remove('flip');
             if (currentGuess[k]) {
-                tile.classList.remove('pop'); // resetting the animation
                 tile.classList.add('pop');
               }
     }
@@ -326,19 +324,14 @@ const submitGuess = () => {
                 
                 // setting gap bw each tile flipping
                 setTimeout(() => {
-
                     tile.classList.add(feedback[i]);
                     tile.classList.add('flip');
-
                   }, i * 400);         
                }
 
                 if (feedback.every( f => f === 'correct' )){
                 BoardSolved[b] = true;
                 document.getElementById(`board${b+1}`).classList.add('solved');
-                // document.querySelectorAll(`.board${b+1} .tile`).forEach(tile => {
-                //     tile.classList.add('solved-tile');
-                // });
 
                 if(BoardSolved[0] && BoardSolved[1]) {
                     Endgame(`Congratulations! You solved both words: ${targetWords.join(' and ')}`,true);
@@ -352,12 +345,26 @@ const submitGuess = () => {
                 BoardSolved[b] = true; // Marking the board as solved
                 document.getElementById(`board${b+1}`).classList.add('solved');
                 }
+
+                const totalAnimationTime = (WORD_LENGTH - 1) * 400 + 600; // Last tile starts + animation duration
+                setTimeout(() => {
+                    console.log(`[TIMING] About to count green tiles after attempt ${currentAttempt}`);
+                    const greenCount = countGreenTiles();
+                    console.log(`[SPEED CHECK] greenTiles: ${greenCount}`);
+                    changeSpeed();
+                }, totalAnimationTime + 100); // Extra 100ms buffer
         }
         
         currentAttempt++;
         updateGuessCounter();
         currentGuess = ''; // Reseting current guess 
         updateBoards();
+
+        // Wait until all flips are done before counting green tiles
+        setTimeout(() => {
+            changeSpeed();
+            console.log(`[SPEED CHECK] greenTiles: ${countGreenTiles()}`);
+        }, totalAnimationTime + 100); // Added extra 100ms buffer to ensure all animations complete
 
     } catch (error) {
         console.error('Error submitting guess:', error);
@@ -396,25 +403,99 @@ const Endgame = (message,isWin = false) => {
     document.removeEventListener('keydown', handleSpecialKeyPress);
 }
 
+//timer functionality
+// let word = '';
+
+const countUniqueLetters = (word) => {
+    let wordString = String(word);
+      if (typeof wordString !== 'string') return 0;
+    let unique = [];
+    for (let char of wordString) {
+        if(!unique.includes(char)){
+            unique.push(char);
+        }
+    }
+    return unique.length;
+}
+
+const getBaseTime = (avgDifficulty) => {
+    if (avgDifficulty <= 3) return 90; // Easy
+    if (avgDifficulty <= 5) return 75; // Medium
+    return 60; // Hard
+};
+
+let timerSpeed = 1;
+let timerInterval;
+let lastUpdate = Date.now();
+
+let baseTime;
+let timeLeft = baseTime;
+
+function getCurrentInterval() {
+    return 1000 / timerSpeed; 
+}
+
+const startTimer = () => {
+  if (timerInterval) clearInterval(timerInterval);
+  lastUpdate = Date.now();
+  timerInterval = setInterval(timerTick, 50);
+};
+
+const updateTimer = () => {
+  const timerLabel = document.getElementById('timer-label');
+  timerLabel.textContent = Math.ceil(timeLeft);
+};
+
+const timerTick = () => {
+  if (gameOver || timeLeft <= 0) {
+    clearInterval(timerInterval);
+    return;
+  }
+  let now = Date.now();
+  let elapsed = (now - lastUpdate) / 1000; // seconds
+  lastUpdate = now;
+  timeLeft -= elapsed * timerSpeed;
+  if (timeLeft < 0) timeLeft = 0;
+  updateTimer();
+  if (timeLeft <= 0) {
+    clearInterval(timerInterval);
+    Endgame(`Time's up! The words were: ${targetWords.join(' and ')}`);
+  }
+};
 
 
+const countGreenTiles = () => {
+    let total = 0;
+    for (let b = 0; b < 2; b++) {
+        const tiles = document.querySelectorAll(`.board${b + 1} .tile.correct`);
+        console.log(`Board ${b+1} green tiles:`, tiles);
+        total += tiles.length;
+    }
+    console.log(`Total green tiles: ${total}`);
+    return total;
+};
 
 
-
-
-
-
-
-
-
-
-
+const changeSpeed = () => {
+    const greenTiles = countGreenTiles();
+    const newSpeed = Math.min(1 + greenTiles * 0.5, 5); // Max 5x speed
+    console.log(`Timer speed changed from ${timerSpeed} to ${newSpeed} (${greenTiles} green tiles)`);
+    timerSpeed = newSpeed;
+};
 
 window.onload = async function() {
-  await fetchWords();      // Fetch the two target words from the API
-  createBoards();          // Dynamically create the two Dordle boards
-  createKeyboard();        // Generate the on-screen keyboard
+  await fetchWords();      
+  createBoards();          
+  createKeyboard();        
   updateBoards();     
-  updateGuessCounter();     // Show empty tiles for the first guess
+  updateGuessCounter();  
     console.log('Game initialized with target words:', targetWords);
+let difficulty1 = countUniqueLetters(targetWords[0]);
+let difficulty2 = countUniqueLetters(targetWords[1]);
+let avgDifficulty = Math.floor((difficulty1 + difficulty2) / 2);
+
+ baseTime = getBaseTime(avgDifficulty);
+ timeLeft = baseTime;
+ startTimer();       
+    
 };
