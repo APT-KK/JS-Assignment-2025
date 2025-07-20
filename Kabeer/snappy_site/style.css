@@ -41,3 +41,16 @@
     object-fit: cover;
 }
   
+#pageContainer {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  margin: 20px auto;
+  flex-wrap: wrap;
+}
+
+
+#pageContainer button:hover {
+  background-color: #def1ff;
+  transform: scale(1.05);
+}

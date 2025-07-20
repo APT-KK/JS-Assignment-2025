@@ -1,4 +1,6 @@
 let items = [], categories = [];
+let currentPage = 1;
+let itemsPerPage = 10;
 
 const fetchData = async () => {
     try {
@@ -33,9 +35,12 @@ const fetchData = async () => {
 
         //event listeners for cat and tag dropdown 
         document.getElementById('category-select').addEventListener('change', () => {
+            currentPage = 1;
             displayItems(items);
         });
+
         document.getElementById('tag-select').addEventListener('change', () => {
+            currentPage = 1;
             displayItems(items);
         });
 
@@ -74,6 +79,28 @@ const fillTags = (allTags) => {
         console.error('Error filling tags:', error);  
     }
 };
+
+const renderPageControls = (totalpages) => {
+    const pagecontainer = document.getElementById('pageContainer')  || document.createElement('div');
+    pagecontainer.id = 'pageContainer';
+    pagecontainer.innerHTML = '';
+
+    for(let i = 1; i <=totalpages ; i++) {
+        const pagebtn = document.createElement('button');
+        pagebtn.textContent = i;
+        pagebtn.disabled = ( i === currentPage);
+        pagebtn.addEventListener('click' , () => {
+            currentPage = i;
+            displayItems(items);
+        })
+        pagecontainer.appendChild(pagebtn);
+    }
+
+    if (!document.getElementById('pageContainer')) {
+    document.getElementById('itemContainer').after(pagecontainer);
+  }
+}
+
 const displayItems = (items) => {
     try {
         const itemContainer = document.getElementById('itemContainer');
@@ -88,7 +115,13 @@ const displayItems = (items) => {
            return matchesTag && matchesCat;
         });
 
-        filteredItems.forEach(fitem => {
+        //add pages feature
+        const totalPages = Math.ceil(filteredItems.length/itemsPerPage);
+        const start = (currentPage - 1)* itemsPerPage;
+        const end = start + itemsPerPage;
+        const pagedItems = filteredItems.slice(start,end);
+
+        pagedItems.forEach(fitem => {
             const itemCard = document.createElement('div');
             itemCard.className = 'item-card';
             itemCard.innerHTML = `
@@ -100,7 +133,9 @@ const displayItems = (items) => {
                 <p>Tags: ${fitem.tags.split('|').join(", ")}</p>
             `;
             itemContainer.appendChild(itemCard);
-        })
+        }) 
+          renderPageControls(totalPages);
+
     } catch (error) {
         console.error('Error displaying items:', error);
     }
