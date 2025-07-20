@@ -45,6 +45,19 @@ const loadMessagesFromDB = () => {
     };
 };
 
+//markdown-parser
+const parseMarkdown = (markdown) => {
+    return markdown
+    .replace(/^# (.*$)/gm, '<h1>$1</h1>')
+    .replace(/^## (.*$)/gm, '<h2>$1</h2>')
+    .replace(/^### (.*$)/gm, '<h3>$1</h3>')
+    .replace(/\n$/gim, '<br>')
+    .replace(/\*\*(.*?)\*\*/gim, '<b>$1</b>')
+    .replace(/\*(.*?)\*/gim, '<i>$1</i>')
+    .replace(/^(\d+\.|-)\s(.*$)/gm, '<li>$2</li>')
+    .replace(/^(<li>.*<\/li>)+/gm, '<ul>$&</ul>');
+}
+
 const ApiKeyInput = document.getElementById("apiKey");
 const model = document.getElementById("modelSelect");
 
@@ -174,11 +187,13 @@ const addMessageToChat = (messageObj) => {
             timestampStr = new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
         }    
 
+        const parsedMessage = parseMarkdown(messageObj.message);
+
     messageElement.innerHTML = `
         <div class="message-header">
             <span class="message-timestamp">${timestampStr}</span>
         </div>
-        <div class="message-content">${messageObj.message}</div>
+        <div class="message-content">${parsedMessage}</div>
     `;
     container.appendChild(messageElement);
     container.scrollTop = container.scrollHeight; // Auto-Scroll to the bottom
